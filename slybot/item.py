@@ -69,8 +69,9 @@ def apply_extractors(descriptor, template_extractors, all_extractors):
             descriptor.attribute_map[field_name] = SlybotFieldDescriptor(field_name, 
                     field_name, field_type_manager.type_processor_class("text"))
         if "regular_expression" in extractor_doc:
-            descriptor.attribute_map[field_name].extractor = \
-                    create_regex_extractor(extractor_doc["regular_expression"])
+            original_extractor = descriptor.attribute_map[field_name].extractor
+            new_extractor = lambda x: create_regex_extractor(extractor_doc["regular_expression"])(original_extractor(x) or '')
+            descriptor.attribute_map[field_name].extractor = new_extractor
         else:
             descriptor.attribute_map[field_name].extractor = \
                     getattr(ExtractorTypes, extractor_doc["builtin_extractor"])
