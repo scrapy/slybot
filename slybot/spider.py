@@ -155,8 +155,8 @@ class IblSpider(BaseSpider):
 
     def start_requests(self):
         if self.start_urls:
-            return [Request(r, callback=self.parse, dont_filter=True) \
-                for r in self.start_urls]
+            return [Request(url, callback=self.parse, dont_filter=True, meta={"start_url": url}) \
+                for url in self.start_urls]
         if self._fpages:
             return self._get_form_requests(self._fpages)
         return self._get_item_requests(self._ipages)
