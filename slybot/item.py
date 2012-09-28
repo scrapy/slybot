@@ -12,9 +12,10 @@ def get_iblitem_class(schema):
     class IblItem(DictItem):
         fields = defaultdict(dict)
         version_fields = []
-        for name, meta in schema['properties']:
-            fields[name] = Field(meta)
-            if not meta.get("vary", False):
+        for props in schema['properties']:
+            name = props["name"]
+            fields[name] = Field(props)
+            if not props.get("vary", False):
                 version_fields.append(name)
         version_fields = sorted(version_fields)
         # like DictItem.__setitem__ but doesn't check the field is declared
@@ -27,12 +28,13 @@ def create_slybot_item_descriptor(schema):
     if schema is None:
         schema = {'id': 'item', 'properties': ()}
     descriptors = []
-    for pname, pdict in schema.get('properties', ()):
+    for pdict in schema.get('properties', []):
+        name = pdict['name']
         description = pdict.get('description')
-        required = not pdict.get('optional', True)
+        required = pdict.get('required', False)
         pclass = field_type_manager.type_processor_class(pdict.get('type'))
         processor = pclass()
-        descriptor = SlybotFieldDescriptor(pname, description, processor, required)
+        descriptor = SlybotFieldDescriptor(name, description, processor, required)
         descriptors.append(descriptor)
     return ItemDescriptor(schema['id'], schema.get('description'), descriptors)
 

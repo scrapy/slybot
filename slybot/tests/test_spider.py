@@ -1,5 +1,7 @@
 import json
+import zipfile
 from unittest import TestCase
+import os
 from os.path import dirname, join
 
 from scrapely.htmlpage import HtmlPage
@@ -7,6 +9,14 @@ from scrapely.htmlpage import HtmlPage
 from slybot.spidermanager import SlybotSpiderManager
 
 _PATH = dirname(__file__)
+
+_ZIPFILE_NAME = "/tmp/slybot_spider_test.zip"
+archive = zipfile.ZipFile(_ZIPFILE_NAME, "w")
+abspath = "%s/data/Plants" % _PATH
+for root, _, files in os.walk(abspath):
+    for _file in files:
+        archive.write(join(root, _file), join(root.replace(abspath, "Plants"), _file))
+archive.close()
 
 class SpiderTest(TestCase):
     smanager = SlybotSpiderManager("%s/data/Plants" % _PATH)
@@ -17,7 +27,7 @@ class SpiderTest(TestCase):
     def test_spider_with_link_template(self):
         name = "seedsofchange"
         spider = self.smanager.create(name)
-        with open(join(self.smanager.datadir, 'spiders', '%s.json' % name)) as f:
+        with self.smanager._open(join(self.smanager.datadir, 'spiders', '%s.json' % name)) as f:
             spec = json.load(f)
         t1, t2 = spec["templates"]
         target1, target2 = [HtmlPage(url=t["url"], body=t["original_body"]) for t in spec["templates"]]
@@ -28,7 +38,7 @@ class SpiderTest(TestCase):
 
         items, link_regions = spider.extract_items(target2)
         self.assertEqual(items[0], {
-                '_template': u'4fac3b47688f920c7800000f',
+                '_template': u'505c964e0d88480c7b000005',
                 '_type': u'default',
                 u'category': [u'Winter Squash'],
                 u'days': [None],
@@ -47,14 +57,14 @@ class SpiderTest(TestCase):
     def test_spider_with_link_region_but_not_link_template(self):
         name = "seedsofchange2"
         spider = self.smanager.create(name)
-        with open(join(self.smanager.datadir, 'spiders', '%s.json' % name)) as f:
+        with self.smanager._open(join(self.smanager.datadir, 'spiders', '%s.json' % name)) as f:
             spec = json.load(f)
         t1, t2 = spec["templates"]
 
         target1, target2 = [HtmlPage(url=t["url"], body=t["original_body"]) for t in spec["templates"]]
         items, link_regions = spider.extract_items(target1)
         self.assertEqual(items[0], {
-                '_template': u'4fad6a7c688f922437000014',
+                '_template': u'505c96500d88480c7b000009',
                 '_type': u'default',
                 u'category': [u'Onions'],
                 u'days': [None],
@@ -70,7 +80,7 @@ class SpiderTest(TestCase):
 
         items, link_regions = spider.extract_items(target2)
         self.assertEqual(items[0], {
-                '_template': u'4fad6a7d688f922437000017',
+                '_template': u'505c96520d88480c7b00000c',
                 '_type': u'default',
                 u'category': [u'Winter Squash'],
                 u'days': [None],
@@ -85,3 +95,7 @@ class SpiderTest(TestCase):
         self.assertEqual(len(link_regions), 1)
         self.assertEqual(len(spider._process_link_regions(target1, link_regions)), 25)
         
+# same tests, but reading from zip file
+class SpiderTestII(SpiderTest):
+    smanager = SlybotSpiderManager(project_zipfile=_ZIPFILE_NAME)
+

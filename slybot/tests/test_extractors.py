@@ -45,16 +45,17 @@ class ExtractorTest(TestCase):
     def test_raw_type_w_regex(self):
         schema = {
             "id": "test",
-            "properties": [('gender', {
+            "properties": [{
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'raw',
                     'vary': False,
-            })],
+            }],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {1: {
-                        "_id": 1,
+                        "id": 1,
                         "field_name": "gender",
                         "regular_expression": "Gender.*(<td\s*>(?:Male|Female)</td>)"
         }}
@@ -66,16 +67,17 @@ class ExtractorTest(TestCase):
     def test_negative_hit_w_regex(self):
         schema = {
             "id": "test",
-            "properties": [('gender', {
+            "properties": [{
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'number',
                     'vary': False,
-            })],
+            }],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {1: {
-                        "_id": 1,
+                        "id": 1,
                         "field_name": "gender",
                         "regular_expression": "Gender\\s+(Male|Female)"
         }}
@@ -87,16 +89,17 @@ class ExtractorTest(TestCase):
     def test_text_type_w_regex(self):
         schema = {
             "id": "test",
-            "properties": [('gender', {
+            "properties": [{
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'text',
                     'vary': False,
-            })],
+            }],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {1: {
-                        "_id": 1,
+                        "id": 1,
                         "field_name": "gender",
                         "regular_expression": "Gender\\s+(Male|Female)"
         }}
@@ -108,22 +111,23 @@ class ExtractorTest(TestCase):
     def test_type_extractor(self):
         schema = {
             "id": "test",
-            "properties": [('gender', {
+            "properties": [{
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'number',
                     'vary': False,
-            })],
+            }],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {
                     1: {
-                        "_id": 1,
+                        "id": 1,
                         "field_name": "gender",
                         "type_extractor": "text"
                     },
                     2: {
-                        "_id": 2,
+                        "id": 2,
                         "field_name": "gender",
                         "regular_expression": "Gender\\s+(Male|Female)"
                     }
@@ -141,7 +145,7 @@ class ExtractorTest(TestCase):
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {
                     1: {
-                        "_id": 1,
+                        "id": 1,
                         "field_name": "gender",
                         "regular_expression": "Gender\\s+(Male|Female)"
                     }
@@ -154,16 +158,17 @@ class ExtractorTest(TestCase):
     def test_text_type_w_regex_and_no_groups(self):
         schema = {
             "id": "test",
-            "properties": [('gender', {
+            "properties": [{
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'text',
                     'vary': False,
-            })],
+            }],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {1: {
-                        "_id": 1,
+                        "id": 1,
                         "field_name": "gender",
                         "regular_expression": "Gender"
         }}
@@ -176,24 +181,26 @@ class ExtractorTest(TestCase):
         schema = {
             "id": "test",
             "properties": [
-                ('gender', {
+                {
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'text',
                     'vary': False,
-                }),
-                ('name', {
+                },
+                {
+                    'name': 'name',
                     'description': '',
-                    'optional': False,
+                    'required': True,
                     'type': 'text',
                     'vary': False,
-                }),
+                },
             ],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {
                     1: {
-                        "_id": 2,
+                        "id": 1,
                         "field_name": "gender",
                         "regular_expression": "([0-9]+)"
                     }
