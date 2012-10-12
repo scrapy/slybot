@@ -1,6 +1,8 @@
-import os, json
+import os
+import json
 
 from zope.interface import implements
+
 from scrapy.interfaces import ISpiderManager
 
 from slybot.spider import IblSpider
@@ -14,25 +16,35 @@ class SlybotSpiderManager(object):
 
     @classmethod
     def from_crawler(cls, crawler):
-        datadir = crawler.settings['PROJECT_DIR']
-        return cls(datadir)
+        return cls(crawler.settings['PROJECT_DIR'])
 
     def create(self, name, **args):
-        with open(os.path.join(self.datadir, 'spiders', '%s.json' % name)) as f:
-            spec = json.load(f)
+        for fname in os.listdir(os.path.join(self.datadir, "spiders")):
+            with open(os.path.join(self.datadir, "spiders", fname)) as f:
+                spider_spec = json.load(f)
+                if spider_spec["name"] == name:
+                    break
+        else:
+            raise KeyError
         with open(os.path.join(self.datadir, 'extractors.json')) as f:
             extractors = json.load(f)
+        extractors = dict((e["id"], e) for e in extractors)
         items = self._load_items()
-        return IblSpider(name, spec, items, extractors, **args)
+        return IblSpider(name, spider_spec, items, extractors, **args)
 
     def list(self):
-        return [i.split(".")[0] for i in os.listdir(os.path.join(self.datadir, "spiders"))]
+        spiders = []
+        for fname in os.listdir(os.path.join(self.datadir, "spiders")):
+            with open(os.path.join(self.datadir, "spiders", fname)) as f:
+                spec = json.load(f)
+                spiders.append(spec["name"])
+        return spiders
 
     def _load_items(self):
         items = {}
-        itemsdir = os.path.join(self.datadir, 'items')
-        for fname in os.listdir(itemsdir):
-            name = fname.split(".")[0]
-            with open(os.path.join(itemsdir, '%s.json' % name)) as f:
-                items[name] = json.load(f)
+        with open(os.path.join(self.datadir, "items.json")) as f:
+            itemlist = json.load(f)
+            for item in itemlist:
+                items[item["id"]] = item
         return items
+

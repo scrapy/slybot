@@ -19,7 +19,6 @@ class SpiderTest(TestCase):
         spider = self.smanager.create(name)
         with open(join(self.smanager.datadir, 'spiders', '%s.json' % name)) as f:
             spec = json.load(f)
-        t1, t2 = spec["templates"]
         target1, target2 = [HtmlPage(url=t["url"], body=t["original_body"]) for t in spec["templates"]]
 
         items, link_regions = spider.extract_items(target1)
@@ -28,7 +27,7 @@ class SpiderTest(TestCase):
 
         items, link_regions = spider.extract_items(target2)
         self.assertEqual(items[0], {
-                '_template': u'4fac3b47688f920c7800000f',
+                '_template': u'505c964e0d88480c7b000005',
                 '_type': u'default',
                 u'category': [u'Winter Squash'],
                 u'days': [None],
@@ -49,12 +48,11 @@ class SpiderTest(TestCase):
         spider = self.smanager.create(name)
         with open(join(self.smanager.datadir, 'spiders', '%s.json' % name)) as f:
             spec = json.load(f)
-        t1, t2 = spec["templates"]
 
         target1, target2 = [HtmlPage(url=t["url"], body=t["original_body"]) for t in spec["templates"]]
         items, link_regions = spider.extract_items(target1)
         self.assertEqual(items[0], {
-                '_template': u'4fad6a7c688f922437000014',
+                '_template': u'505c96500d88480c7b000009',
                 '_type': u'default',
                 u'category': [u'Onions'],
                 u'days': [None],
@@ -70,7 +68,7 @@ class SpiderTest(TestCase):
 
         items, link_regions = spider.extract_items(target2)
         self.assertEqual(items[0], {
-                '_template': u'4fad6a7d688f922437000017',
+                '_template': u'505c96520d88480c7b00000c',
                 '_type': u'default',
                 u'category': [u'Winter Squash'],
                 u'days': [None],

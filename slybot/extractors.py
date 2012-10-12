@@ -1,4 +1,5 @@
 import re
+import copy
 from itertools import groupby
 
 from scrapely.extractors import htmlregion
@@ -37,9 +38,13 @@ class PipelineExtractor:
         return repr(self.extractors) 
     
 
-def apply_extractors(descriptor, template_extractors_ids, extractors):
+def apply_extractors(descriptor, template_extractors_refs, extractors):
     field_type_manager = FieldTypeManager()
-    template_extractors = [extractors[eid] for eid in template_extractors_ids]
+    template_extractors = []
+    for spec in template_extractors_refs:
+        espec = extractors[spec["id"]].copy()
+        espec["field_name"] = spec["field_name"]
+        template_extractors.append(espec)
     for field_name, field_extractors in groupby(template_extractors or (), lambda x: x["field_name"]):
         equeue = []
         for extractor_doc in field_extractors:
