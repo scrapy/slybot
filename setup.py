@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 setup(name='slybot',
-      version='0.9',
+      version='0.10',
       license='BSD',
       description='Slybot crawler',
       author='Scrapy project',

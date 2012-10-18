@@ -45,20 +45,20 @@ class ExtractorTest(TestCase):
     def test_raw_type_w_regex(self):
         schema = {
             "id": "test",
-            "properties": [('gender', {
+            "properties": [{
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'raw',
                     'vary': False,
-            })],
+            }],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {1: {
-                        "_id": 1,
-                        "field_name": "gender",
+                        "id": 1,
                         "regular_expression": "Gender.*(<td\s*>(?:Male|Female)</td>)"
         }}
-        apply_extractors(descriptor, [1], extractors)
+        apply_extractors(descriptor, [{"id": 1, "field_name": "gender"}], extractors)
 
         ibl_extractor = InstanceBasedLearningExtractor([(self.template, descriptor)])
         self.assertEqual(ibl_extractor.extract(self.target)[0][0], {u'gender': [u'<td >Male</td>']})
@@ -66,20 +66,20 @@ class ExtractorTest(TestCase):
     def test_negative_hit_w_regex(self):
         schema = {
             "id": "test",
-            "properties": [('gender', {
+            "properties": [{
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'number',
                     'vary': False,
-            })],
+            }],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {1: {
-                        "_id": 1,
-                        "field_name": "gender",
+                        "id": 1,
                         "regular_expression": "Gender\\s+(Male|Female)"
         }}
-        apply_extractors(descriptor, [1], extractors)
+        apply_extractors(descriptor, [{"id": 1, "field_name": "gender"}], extractors)
         
         ibl_extractor = InstanceBasedLearningExtractor([(self.template, descriptor)])
         self.assertEqual(ibl_extractor.extract(self.target)[0], None)
@@ -87,20 +87,20 @@ class ExtractorTest(TestCase):
     def test_text_type_w_regex(self):
         schema = {
             "id": "test",
-            "properties": [('gender', {
+            "properties": [{
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'text',
                     'vary': False,
-            })],
+            }],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {1: {
-                        "_id": 1,
-                        "field_name": "gender",
+                        "id": 1,
                         "regular_expression": "Gender\\s+(Male|Female)"
         }}
-        apply_extractors(descriptor, [1], extractors)
+        apply_extractors(descriptor, [{"id": 1, "field_name": "gender"}], extractors)
         
         ibl_extractor = InstanceBasedLearningExtractor([(self.template, descriptor)])
         self.assertEqual(ibl_extractor.extract(self.target)[0][0], {u'gender': [u'Male']})
@@ -108,27 +108,26 @@ class ExtractorTest(TestCase):
     def test_type_extractor(self):
         schema = {
             "id": "test",
-            "properties": [('gender', {
+            "properties": [{
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'number',
                     'vary': False,
-            })],
+            }],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {
                     1: {
-                        "_id": 1,
-                        "field_name": "gender",
+                        "id": 1,
                         "type_extractor": "text"
                     },
                     2: {
-                        "_id": 2,
-                        "field_name": "gender",
+                        "id": 2,
                         "regular_expression": "Gender\\s+(Male|Female)"
                     }
         }
-        apply_extractors(descriptor, [1, 2], extractors)
+        apply_extractors(descriptor, [{"id": 1, "field_name": "gender"}, {"id": 2, "field_name": "gender"}], extractors)
         
         ibl_extractor = InstanceBasedLearningExtractor([(self.template, descriptor)])
         self.assertEqual(ibl_extractor.extract(self.target)[0][0], {u'gender': [u'Male']})
@@ -141,12 +140,11 @@ class ExtractorTest(TestCase):
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {
                     1: {
-                        "_id": 1,
-                        "field_name": "gender",
+                        "id": 1,
                         "regular_expression": "Gender\\s+(Male|Female)"
                     }
         }
-        apply_extractors(descriptor, [1], extractors)
+        apply_extractors(descriptor, [{"id": 1, "field_name": "gender"}], extractors)
         
         ibl_extractor = InstanceBasedLearningExtractor([(self.template, descriptor)])
         self.assertEqual(ibl_extractor.extract(self.target)[0][0], {u'gender': [u'Male']})
@@ -154,20 +152,20 @@ class ExtractorTest(TestCase):
     def test_text_type_w_regex_and_no_groups(self):
         schema = {
             "id": "test",
-            "properties": [('gender', {
+            "properties": [{
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'text',
                     'vary': False,
-            })],
+            }],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {1: {
-                        "_id": 1,
-                        "field_name": "gender",
+                        "id": 1,
                         "regular_expression": "Gender"
         }}
-        apply_extractors(descriptor, [1], extractors)
+        apply_extractors(descriptor, [{"id": 1, "field_name": "gender"}], extractors)
         
         ibl_extractor = InstanceBasedLearningExtractor([(self.template, descriptor)])
         self.assertEqual(ibl_extractor.extract(self.target)[0][0], {u'gender': [u'Gender']})
@@ -176,29 +174,30 @@ class ExtractorTest(TestCase):
         schema = {
             "id": "test",
             "properties": [
-                ('gender', {
+                {
+                    'name': 'gender',
                     'description': '',
-                    'optional': True,
+                    'required': False,
                     'type': 'text',
                     'vary': False,
-                }),
-                ('name', {
+                },
+                {
+                    'name': 'name',
                     'description': '',
-                    'optional': False,
+                    'required': True,
                     'type': 'text',
                     'vary': False,
-                }),
+                },
             ],
         }
         descriptor = create_slybot_item_descriptor(schema)
         extractors =  {
                     1: {
-                        "_id": 2,
-                        "field_name": "gender",
+                        "id": 1,
                         "regular_expression": "([0-9]+)"
                     }
         }
-        apply_extractors(descriptor, [1], extractors)
+        apply_extractors(descriptor, [{"id": 1, "field_name": "gender"}], extractors)
         
         ibl_extractor = InstanceBasedLearningExtractor([(self.template2, descriptor)])
         self.assertEqual(ibl_extractor.extract(self.target2)[0][0], {u'name': [u'Name Olivia']})
