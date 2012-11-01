@@ -8,6 +8,8 @@ from scrapy.http import Request, HtmlResponse, FormRequest
 from scrapely.htmlpage import HtmlPage, dict_to_page
 from scrapely.extraction import InstanceBasedLearningExtractor
 
+from loginform import fill_login_form
+
 from slybot.item import get_iblitem_class, create_slybot_item_descriptor
 from slybot.extractors import apply_extractors
 from slybot.utils import iter_unique_scheme_hostname
@@ -89,13 +91,30 @@ class IblSpider(BaseSpider):
                 'extractor': extractor,
             }
 
+        self.login_requests = []
+        for rdata in spec.get("init_requests", []):
+            if rdata["type"] == "login":
+                request = Request(url=rdata.pop("loginurl"), meta=rdata, callback=self.parse_login_page)
+                self.login_requests.append(request)
+
+    def parse_login_page(self, response):
+        username = response.request.meta["username"]
+        password = response.request.meta["password"]
+        args, url, method = fill_login_form(response.url, response.body, username, password)
+        return FormRequest(url, method=method, formdata=args, callback=self.after_login)
+
+    def after_login(self, response):
+        for result in self.parse(response):
+            yield result
+        for req in self._start_requests():
+            yield req
+
     def _get_allowed_domains(self, templates):
         urls = [x.url for x in templates]
         urls += self.start_urls
         return [x[1] for x in iter_unique_scheme_hostname(urls)]
 
     def _get_form_requests(self, templates):
-        reqs = []
         # TODO: filter unique schema netlocs?
         for t in templates:
             # assume all templates are html and unicode
@@ -105,11 +124,9 @@ class IblSpider(BaseSpider):
                                                 formname='SLYBOT-FORM',
                                                 callback=self.parse,
                                                 dont_filter=True)
-            reqs.append(request)
-        return reqs
+            yield request
 
     def _requests_to_follow(self, htmlpage):
-        requests = []
         if self._links_ibl_extractor is not None:
             extracted = self._links_ibl_extractor.extract(htmlpage)[0]
             if extracted:
@@ -121,14 +138,12 @@ class IblSpider(BaseSpider):
                         if request.url in seen:
                             continue
                         seen.add(request.url)
-                        requests.append(request)
+                        yield request
         else:
-            requests = self._request_to_follow_from_region(htmlpage)
-
-        return requests
+            for request in self._request_to_follow_from_region(htmlpage):
+                yield request
             
     def _request_to_follow_from_region(self, htmlregion):
-        requests = []
         seen = set()
 
         for link in self.link_extractor.links_to_follow(htmlregion):
@@ -141,10 +156,18 @@ class IblSpider(BaseSpider):
                 request = Request(url)
                 if link.text:
                     request.meta['link_text'] = link.text
-                requests.append(request)
-        return requests
+                yield request
 
     def start_requests(self):
+        start_requests = []
+        if self.login_requests:
+            start_requests = self.login_requests
+        else:
+            start_requests = self._start_requests()
+        for req in start_requests:
+            yield req
+
+    def _start_requests(self):
         if self._fpages:
             return self._get_form_requests(self._fpages)
         return [Request(r, callback=self.parse, dont_filter=True) \
@@ -161,22 +184,24 @@ class IblSpider(BaseSpider):
 
     def _process_link_regions(self, htmlpage, link_regions):
         """Process link regions if any, and generate requests"""
-        requests_to_follow = []
         if link_regions:
             for link_region in link_regions:
                 htmlregion = HtmlPage(htmlpage.url, htmlpage.headers, \
                         link_region, encoding=htmlpage.encoding)
-                requests_to_follow.extend(self._requests_to_follow(htmlregion))
+                for request in self._requests_to_follow(htmlregion):
+                    yield request
         else:
-            requests_to_follow = self._requests_to_follow(htmlpage)
-        return requests_to_follow
+            for request in self._requests_to_follow(htmlpage):
+                yield request
 
     def handle_html(self, response):
         htmlpage = HtmlPage(response.url, response.headers, \
                     response.body_as_unicode(), encoding=response.encoding)
         items, link_regions = self.extract_items(htmlpage)
-        requests_to_follow = self._process_link_regions(htmlpage, link_regions)
-        return requests_to_follow + items
+        for item in items:
+            yield item
+        for request in self._process_link_regions(htmlpage, link_regions):
+            yield request
         
     def extract_items(self, htmlpage):
         """This method is also called from UI webservice to extract items"""
