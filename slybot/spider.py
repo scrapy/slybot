@@ -64,7 +64,6 @@ class IblSpider(BaseSpider):
             self.start_urls = self.start_urls.splitlines()
 
         self.link_extractor = LinkExtractor()
-        self.allowed_domains = self._get_allowed_domains(self._ipages)
         
         self.build_url_filter(spec)
 
@@ -97,6 +96,8 @@ class IblSpider(BaseSpider):
                 request = Request(url=rdata.pop("loginurl"), meta=rdata, callback=self.parse_login_page)
                 self.login_requests.append(request)
 
+        self.allowed_domains = self._get_allowed_domains(self._ipages)
+
     def parse_login_page(self, response):
         username = response.request.meta["username"]
         password = response.request.meta["password"]
@@ -112,6 +113,7 @@ class IblSpider(BaseSpider):
     def _get_allowed_domains(self, templates):
         urls = [x.url for x in templates]
         urls += self.start_urls
+        urls += [r.url for r in self.login_requests]
         return [x[1] for x in iter_unique_scheme_hostname(urls)]
 
     def _get_form_requests(self, templates):
