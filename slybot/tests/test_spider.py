@@ -14,10 +14,6 @@ _PATH = dirname(__file__)
 class SpiderTest(TestCase):
     smanager = SlybotSpiderManager("%s/data/Plants" % _PATH)
 
-    def test_list(self):
-        self.assertEqual(set(self.smanager.list()), set(["seedsofchange", "seedsofchange2",
-                "seedsofchange.com", "pinterest.com"]))
-
     def test_spider_with_link_template(self):
         name = "seedsofchange"
         spider = self.smanager.create(name)
