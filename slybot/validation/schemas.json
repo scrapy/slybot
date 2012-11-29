@@ -1,0 +1,78 @@
+[
+    {
+        "$id": "project",
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "version": {"type": "string"},
+            "comment": {"type": "string", "optional": true}
+        }
+    },
+    {
+        "$id": "items",
+        "type": "mapping",
+        "items": {"type": "item"}
+    },
+    {
+        "$id": "item",
+        "type": "object",
+        "properties": {
+            "fields": {"type": "mapping", "items": {"type": "field"}}
+        }
+    },
+    {
+        "$id": "field",
+        "type": "object",
+        "properties": {
+            "type": {"type": "string"},
+            "required": {"type": "boolean"},
+            "vary": {"type": "boolean"}
+        }
+    },
+    {
+        "$id": "extractors",
+        "type": "mapping",
+        "items": {"type": "extractor"}
+    },
+    {
+        "$id": "extractor",
+        "type": "object",
+        "properties": {
+            "type_extractor": {"type": "string", "optional": true},
+            "regular_expression": {"type": "string", "format": "regex", "optional": true}
+        }
+    },
+    {
+        "$id": "spider",
+        "type": "object",
+        "properties": {
+            "start_urls": {"type": "array", "items": {"type": "string", "format": "url"}},
+            "links_to_follow": {"type": "enum", "items": ["none", "patterns"]},
+            "follow_patterns": {"type": "array", "items": {"type": "string", "format": "regex"}, "optional": true},
+            "exclude_patterns": {"type": "array", "items": {"type": "string", "format": "regex"}, "optional": true},
+            "respect_nofollow": {"type": "boolean"},
+            "templates": {"type": "array", "items": {"type": "template"}},
+            "init_requests": {"type": "array", "items": {"type": "request"}, "optional": "true"}
+        }
+    },
+    {
+        "$id": "template",
+        "type": "object",
+        "properties": {
+            "page_id": {"type": "string"},
+            "page_type": {"type": "enum", "items": ["links", "item"]},
+            "scrapes": {"type": "string"},
+            "url": {"type": "string", "format": "url"},
+            "extractors": {"type": "mapping", "items": {"type": "array", "items": {"type": "string"}}},
+            "annotated_body": {"type": "string"},
+            "original_body": {"type": "string"}
+        }
+    },
+    {
+        "$id": "request",
+        "type": "object",
+        "properties": {
+            "type": {"type": "string"}
+        }
+    }
+]
