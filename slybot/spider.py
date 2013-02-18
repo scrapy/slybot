@@ -200,11 +200,12 @@ class IblSpider(BaseSpider):
         content_type = response.headers.get('Content-Type', '')
         if isinstance(response, HtmlResponse):
             return self.handle_html(response)
-        elif "application/rss+xml" in content_type:
+        elif content_type and "application/rss+xml" in content_type:
             return self.handle_rss(response) 
         else:
             self.log("Ignoring page with content-type=%r: %s" % (content_type, \
                 response.url), level=log.DEBUG)
+            return []
 
     def _process_link_regions(self, htmlpage, link_regions):
         """Process link regions if any, and generate requests"""
