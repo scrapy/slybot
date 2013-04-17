@@ -69,11 +69,14 @@ Project
 
 The project object contains the global project metadata::
 
-	{
-	    "name": "Slybot Test Project",
-	    "version": "1.0",
-	    "comment": ""
-	}
+    {
+        "name": "Slybot Test Project",
+        "version": "1.0",
+        "comment": "",
+        "scrapy_settings": {
+            ...
+        }
+    }
 
 Attributes:
 
@@ -85,6 +88,39 @@ version : string
   
 comment : string : optional
   A comment provided by the user.
+
+scrapy_settings: mapping : optional
+  A free mapping to specify scrapy settings.
+
+Scrapy settings
+---------------
+
+Allow to specify global or per spider scrapy settings::
+
+        {
+            "spiders" {
+                "spider name 1": {
+                    "setting name 1": setting value 1,
+                    "setting name 2": setting value 2,
+                    ...
+                },
+                "spider name 2": {
+                    ...
+                }
+            },
+            setting name 3: setting value 3,
+            ...
+        }
+
+Attributes:
+
+spiders: mapping : optional
+  The only reserved attribute. It is a free key/value mapping from spider name to setting spec
+
+Additional attributes:
+  A setting spec.
+
+Setting specs are just a free mapping from a setting name to a setting value. The last can be anything.
 
 Items
 -----
@@ -185,6 +221,11 @@ The Spider object is the top-level object that describes a slybot spider::
         "respect_nofollow": boolean,
         "templates": list of template objects,
         "init_requests": list of request objects,
+        "meta": {
+            "meta key 1": meta value 1,
+            "meta key 2": meta value 2,
+            ...
+        }
     }
 
 Attributes:
@@ -214,6 +255,9 @@ templates : list of objects
 init_requests : list of request objects : optional
   A list of requests objects that will be executed (sequentially, in order)
   when the spider is opened and before visiting the start urls.
+
+meta: mapping: optional
+    A free mapping to add any additional metadata that may be useful for the bot for running the spider.
 
 Template
 --------

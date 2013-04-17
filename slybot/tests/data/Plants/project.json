@@ -1,4 +1,13 @@
 {
     "version": "1", 
-    "name": "Plants"
+    "name": "Plants",
+    "scrapy_settings": {
+        "spiders": {
+            "cargurus": {
+                "CONCURRENT_REQUESTS_PER_DOMAIN": 1,
+                "DOWNLOAD_DELAY": 0.5
+            }
+        },
+        "LOG_LEVEL": "DEBUG"
+    }
 }

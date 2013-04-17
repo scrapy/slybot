@@ -5,7 +5,13 @@
         "properties": {
             "name": {"type": "string", "required": true},
             "version": {"type": "string", "required": true},
-            "comment": {"type": "string"}
+            "comment": {"type": "string"},
+            "scrapy_settings": {
+                "spiders": {
+                    "additionalProperties": {"type": "any"}
+                },
+                "additionalProperties": {"type": "any"}
+            }
         }
     },
     {
@@ -52,7 +58,8 @@
             "exclude_patterns": {"type": "array", "items": {"type": "string", "format": "regex"}},
             "respect_nofollow": {"type": "boolean", "required": true},
             "templates": {"type": "array", "items": {"$ref": "template"}, "required": true},
-            "init_requests": {"type": "array", "items": {"$ref": "request"}}
+            "init_requests": {"type": "array", "items": {"$ref": "request"}},
+            "meta": {"additionalProperties": {"type": "any"}}
         }
     },
     {
