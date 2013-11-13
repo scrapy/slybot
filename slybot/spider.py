@@ -56,12 +56,14 @@ class IblSpider(BaseSpider):
         self.rss_link_extractor = RssLinkExtractor()
         self.build_url_filter(spec)
 
+        self.item_classes = dict((name, SlybotItem.create_iblitem_class(schema)) \
+                for name, schema in item_schemas.items())
+
         self.itemcls_info = {}
         for itemclass_name, triplets in itertools.groupby(self._item_template_pages, operator.itemgetter(0)):
             page_extractors_pairs = map(operator.itemgetter(1, 2), triplets)
+            item_cls = self.item_classes[itemclass_name]
             schema = item_schemas[itemclass_name]
-            item_cls = SlybotItem.create_iblitem_class(schema)
-
             page_descriptor_pairs = []
             for page, template_extractors in page_extractors_pairs:
                 item_descriptor = create_slybot_item_descriptor(schema)
