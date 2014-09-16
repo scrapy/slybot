@@ -1,2 +1,5 @@
 *.pyc
 docs/_build
+build
+dist
+slybot.egg-info
