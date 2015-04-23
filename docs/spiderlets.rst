@@ -4,9 +4,7 @@ Spiderlets
 
 .. warning::
 
-   This functionality is experimental and its API may undergo changes from time
-   to time. Use at your own risk and please contribute feedback to make it
-   stable.
+   **This functionality is deprecated and no longer maintained.**
 
 
 The slybot spider alone is not able to solve all the crawling and extraction difficulties that may arise for every possible case: data
