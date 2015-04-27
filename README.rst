@@ -1,7 +1,10 @@
-==============
-Slybot crawler
-==============
+============================
+Slybot is now part of Portia
+============================
 
-This repository is deprecated, slybot is now part of  `Portia`_.
+Slybot is now part of the `Portia`_ scraper.
+
+The commit history of this repository has been preserved only for reference
+purposes.
 
 .. _Portia: https://github.com/scrapinghub/portia
